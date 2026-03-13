@@ -8,6 +8,6 @@ class TaskSource(Protocol):
     def get_tasks(self) -> List[str]:
         """
         Возвращает список задач.
-        :return: список задач (строк)
+        :return: список задач
         """
         ...
