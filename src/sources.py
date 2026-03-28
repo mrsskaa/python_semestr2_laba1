@@ -1,4 +1,5 @@
 import logging
+from src.model import Task
 
 logger = logging.getLogger(__name__)
 
@@ -15,33 +16,37 @@ class FileTaskSource:
         self.file_name = file_name
         logger.info(f"FileTaskSource создан с файлом: {file_name}")
 
-    def get_tasks(self) -> list[str]:
+    def get_tasks(self) -> list[Task]:
         """
         Читает задачи из файла, игнорируя пустые строки.
 
         :return: список задач или пустой список при ошибке
         """
         logger.debug(f"Чтение задач из файла: {self.file_name}")
+        tasks = []
         try:
-            tasks = []
             with open(self.file_name, 'r', encoding='utf-8') as file:
                 for line_num, line in enumerate(file, 1):
                     line = line.strip()
                     if not line:
-                        logger.debug(f"Строка {line_num} пустая, пропускаем")
                         continue
-                    tasks.append(line)
-                    logger.debug(f"Прочитана задача: {line}")
+
+                    task = Task(
+                        id=line_num,
+                        description=line,
+                        priority=3,
+                        status="pending"
+                    )
+                    tasks.append(task)
 
             logger.info(f"Из файла {self.file_name} прочитано {len(tasks)} задач")
             return tasks
 
         except FileNotFoundError:
             logger.error(f"Файл {self.file_name} не найден")
-            print(f"File {self.file_name} not found")
             return []
         except Exception as e:
-            logger.exception(f"Неожиданная ошибка при чтении файла: {e}")
+            logger.exception(f"Ошибка при чтении файла: {e}")
             return []
 
 
@@ -84,7 +89,7 @@ class GeneratorTaskSource:
         self._cnt = value
         logger.info(f"cnt изменён с {old_value} на {value}")
 
-    def get_tasks(self) -> list[str]:
+    def get_tasks(self) -> list[Task]:
         """
         Генерирует задачи в формате "Task i".
 
@@ -93,7 +98,12 @@ class GeneratorTaskSource:
         logger.debug(f"Генерация {self._cnt} задач")
         tasks = []
         for i in range(1, self._cnt + 1):
-            task = f"Task {i}"
+            task = Task(
+                id=i,
+                description=f"Сгенерированная задача номер {i}",
+                priority=3,
+                status="pending"
+            )
             tasks.append(task)
             logger.debug(f"Сгенерирована задача: {task}")
 
@@ -108,19 +118,29 @@ class APITaskSource:
         """Инициализирует API-заглушку."""
         logger.info("APITaskSource создан")
 
-    def get_tasks(self) -> list[str]:
+    def get_tasks(self) -> list[Task]:
         """
         Возвращает заранее заданный список задач.
 
         :return: фиксированный список задач
         """
-        tasks = [
+        tasks_data = [
             "Сделать лабу",
             "Написать ридми",
             "Отправить Cамиру",
             "Доделать дизайн",
             "Начать писать фронт по практике"
         ]
+        tasks = []
+        for i, description in enumerate(tasks_data, 1):
+            task = Task(
+                id=i,
+                description=description,
+                priority=3,
+                status="pending"
+            )
+            tasks.append(task)
+
         logger.info(f"API-заглушка вернула {len(tasks)} задач")
         logger.debug(f"Задачи из API: {tasks}")
         return tasks

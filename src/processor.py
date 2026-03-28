@@ -1,3 +1,4 @@
+from src.model import Task
 from src.protocol import TaskSource
 import logging
 
@@ -7,7 +8,7 @@ logger = logging.getLogger(__name__)
 class TaskProcessor:
     """Обработчик задач из источника, соответствующего протоколу TaskSource."""
 
-    def process(self, source: TaskSource) -> list[str]:
+    def process(self, source: TaskSource) -> list[Task]:
         """
         Проверяет источник, получает и выводит задачи.
 
